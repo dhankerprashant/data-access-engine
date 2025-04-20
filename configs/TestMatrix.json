@@ -1,0 +1,103 @@
+[
+    {
+      "id": 1,
+      "name": "PrivateBanker Full Access",
+      "user": "PrivateBanker",
+      "endpoint": "/api/customers/102938",
+      "headers": {
+        "x-simulate-user": "PrivateBanker"
+      },
+      "expectation": "Mask, redact, truncate rules applied; access to audit fields."
+    },
+    {
+      "id": 2,
+      "name": "SupportAgent PII Restricted",
+      "user": "SupportAgent",
+      "endpoint": "/api/customers/102938",
+      "headers": {
+        "x-simulate-user": "SupportAgent"
+      },
+      "expectation": "Email and mobile masked; no PII or risk field access."
+    },
+    {
+      "id": 3,
+      "name": "RiskAnalyst Risk View Only",
+      "user": "RiskAnalyst",
+      "endpoint": "/api/customers/102938",
+      "headers": {
+        "x-simulate-user": "RiskAnalyst"
+      },
+      "expectation": "PEP status triggers deny; KYC hidden."
+    },
+    {
+      "id": 4,
+      "name": "ConflictTester - Mask vs Hide",
+      "user": "ConflictTester",
+      "endpoint": "/api/customers/102938",
+      "headers": {
+        "x-simulate-user": "ConflictTester"
+      },
+      "expectation": "Field hidden due to hide being more restrictive; conflict trace included."
+    },
+    {
+      "id": 5,
+      "name": "PolicyDenyUser - Composite Deny",
+      "user": "PolicyDenyUser",
+      "endpoint": "/api/customers/102938",
+      "headers": {
+        "x-simulate-user": "PolicyDenyUser"
+      },
+      "expectation": "If PEP = true AND (KYC ≠ Completed OR Risk = High), entire response denied."
+    },
+    {
+      "id": 6,
+      "name": "AdminAllAccess - Full Debug View",
+      "user": "AdminAllAccess",
+      "endpoint": "/api/customers/102938",
+      "headers": {
+        "x-simulate-user": "AdminAllAccess"
+      },
+      "expectation": "All rules applied, all fields visible unless denied or masked."
+    },
+    {
+      "id": 7,
+      "name": "Invalid SimUser",
+      "user": "UnknownGuy",
+      "endpoint": "/api/customers/102938",
+      "headers": {
+        "x-simulate-user": "UnknownGuy"
+      },
+      "expectation": "400 error returned - user not found in RoleSimulations."
+    },
+    {
+      "id": 8,
+      "name": "JWT Auth - fallback to token",
+      "user": "JWTUser",
+      "endpoint": "/api/customers/102938",
+      "headers": {
+        "Authorization": "Bearer <your-valid-token>"
+      },
+      "expectation": "LDAP groups resolved from token payload and rules applied accordingly."
+    },
+    {
+      "id": 9,
+      "name": "JWT Deny Trigger",
+      "user": "JWTUserWithDeny",
+      "endpoint": "/api/customers/102938",
+      "headers": {
+        "Authorization": "Bearer <token-includes-deny-group>"
+      },
+      "expectation": "Response denied due to deny-if-condition match from access code."
+    },
+    {
+      "id": 10,
+      "name": "Schema Version Match",
+      "user": "AdminAllAccess",
+      "endpoint": "/api/customers/102938",
+      "headers": {
+        "x-simulate-user": "AdminAllAccess"
+      },
+      "expectation": "Only rules with matching schemaVersion to customer applied."
+    }
+  ]
+  

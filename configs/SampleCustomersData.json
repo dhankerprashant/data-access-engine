@@ -1,0 +1,192 @@
+[
+  {
+    "customerId": "CUST-938471",
+    "fullName": {
+      "firstName": "Arjun",
+      "middleName": "Raj",
+      "lastName": "Verma"
+    },
+    "dateOfBirth": "1985-06-15",
+    "gender": "Male",
+    "income": 185000.0,
+    "contactInformation": {
+      "email": "arjun.verma@example.com",
+      "phone": {
+        "mobile": "+971501234567",
+        "home": "+97142678901"
+      },
+      "address": {
+        "line1": "Apartment 23B, Burj Views",
+        "line2": "",
+        "city": "Dubai",
+        "state": "Dubai",
+        "postalCode": "00000",
+        "country": "UAE"
+      }
+    },
+    "identityDocuments": [
+      {
+        "documentType": "Passport",
+        "documentNumber": "N78234567",
+        "countryOfIssue": "India",
+        "expiryDate": "2031-01-15"
+      },
+      {
+        "documentType": "Emirates ID",
+        "documentNumber": "784-1985-1234567-1",
+        "expiryDate": "2026-11-20"
+      }
+    ],
+    "customerType": "Individual",
+    "riskProfile": {
+      "kycStatus": "Completed",
+      "riskCategory": "Low",
+      "pepStatus": false,
+      "fatcaStatus": "Compliant"
+    },
+    "accounts": [
+      {
+        "accountId": "ACC-789012",
+        "accountType": "Savings",
+        "currency": "AED",
+        "status": "Active",
+        "balance": 25843.75,
+        "openedDate": "2018-04-22",
+        "branchId": "BR-DXB-01"
+      }
+    ],
+    "relationships": [],
+    "customerPreferences": {
+      "language": "English",
+      "communicationMode": [
+        "Email",
+        "SMS"
+      ],
+      "marketingConsent": true
+    },
+    "audit": {
+      "createdBy": "OnboardingSystem",
+      "createdAt": "2018-04-22T10:15:00Z",
+      "lastUpdatedBy": "CustomerServiceAgent-110",
+      "lastUpdatedAt": "2025-04-12T07:30:00Z"
+    },
+    "policySchemaVersion": "v1.0"
+  },
+  {
+    "customerId": "CUST-102938",
+    "fullName": {
+      "firstName": "Fatima",
+      "middleName": "",
+      "lastName": "Al-Farsi"
+    },
+    "dateOfBirth": "1992-11-03",
+    "gender": "Female",
+    "income": 320000.0,
+    "contactInformation": {
+      "email": "fatima.alfarsi@example.com",
+      "phone": {
+        "mobile": "+971508888888",
+        "home": ""
+      },
+      "address": {
+        "line1": "Villa 17, Palm Jumeirah",
+        "line2": "",
+        "city": "Dubai",
+        "state": "Dubai",
+        "postalCode": "00000",
+        "country": "UAE"
+      }
+    },
+    "identityDocuments": [
+      {
+        "documentType": "Passport",
+        "documentNumber": "M12345678",
+        "countryOfIssue": "UAE",
+        "expiryDate": "2030-07-01"
+      }
+    ],
+    "customerType": "High Net Worth",
+    "riskProfile": {
+      "pepStatus": true,
+      "riskCategory": "Medium",
+      "kycStatus": "Incomplete",
+      "fatcaStatus": "Compliant"
+    },
+    "accounts": [],
+    "relationships": [],
+    "customerPreferences": {
+      "language": "Arabic",
+      "communicationMode": [
+        "Phone"
+      ],
+      "marketingConsent": false
+    },
+    "audit": {
+      "createdBy": "HNWTeam",
+      "createdAt": "2020-10-10T11:00:00Z",
+      "lastUpdatedBy": "PrivateBanker-005",
+      "lastUpdatedAt": "2025-03-10T15:00:00Z"
+    },
+    "policySchemaVersion": "v1.0"
+  },
+  {
+    "customerId": "CUST-556677",
+    "fullName": {
+      "firstName": "James",
+      "middleName": "E.",
+      "lastName": "Smith"
+    },
+    "dateOfBirth": "1978-03-22",
+    "gender": "Male",
+    "income": 75000.0,
+    "contactInformation": {
+      "email": "james.smith@example.com",
+      "phone": {
+        "mobile": "+971507777777",
+        "home": "+97143332211"
+      },
+      "address": {
+        "line1": "Flat 405, Marina Heights",
+        "line2": "",
+        "city": "Abu Dhabi",
+        "state": "Abu Dhabi",
+        "postalCode": "00000",
+        "country": "UAE"
+      }
+    },
+    "identityDocuments": [],
+    "customerType": "Standard",
+    "riskProfile": {
+      "kycStatus": "Pending",
+      "riskCategory": "High",
+      "pepStatus": true,
+      "fatcaStatus": "Non-Compliant"
+    },
+    "accounts": [
+      {
+        "accountId": "ACC-112233",
+        "accountType": "Current",
+        "currency": "AED",
+        "status": "Dormant",
+        "balance": 0.0,
+        "openedDate": "2015-02-01",
+        "branchId": "BR-AUH-03"
+      }
+    ],
+    "relationships": [],
+    "customerPreferences": {
+      "language": "English",
+      "communicationMode": [
+        "Email"
+      ],
+      "marketingConsent": false
+    },
+    "audit": {
+      "createdBy": "LegacyMigration",
+      "createdAt": "2015-02-01T09:00:00Z",
+      "lastUpdatedBy": "AuditOps-010",
+      "lastUpdatedAt": "2025-01-15T13:45:00Z"
+    },
+    "policySchemaVersion": "v1.0"
+  }
+]

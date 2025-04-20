@@ -1,0 +1,55 @@
+{
+  "PrivateBanker": {
+    "description": "Has access to PII and audit fields.",
+    "ldapGroups": [
+      "LDAP_FINANCE_TEAM",
+      "LDAP_RISK_TEAM"
+    ]
+  },
+  "SupportAgent": {
+    "description": "Restricted PII access.",
+    "ldapGroups": [
+      "LDAP_SUPPORT_TEAM"
+    ]
+  },
+  "RiskAnalyst": {
+    "description": "Can view risk-related fields.",
+    "ldapGroups": [
+      "LDAP_RISK_TEAM"
+    ]
+  },
+  "ConflictTester": {
+    "description": "User to test conflict between masking and hiding rules.",
+    "ldapGroups": [
+      "LDAP_TEST_MASK",
+      "LDAP_TEST_HIDE"
+    ]
+  },
+  "PolicyDenyUser": {
+    "description": "User triggering nested deny-if-condition for validation.",
+    "ldapGroups": [
+      "LDAP_TEST_NESTED_DENY"
+    ]
+  },
+  "BasicUser": {
+    "description": "",
+    "ldapGroups": [
+      "LDAP_BASIC_GROUP"
+    ]
+  },
+  "AdminAllAccess": {
+    "description": "Test user with complete visibility for debug and audit scenarios.",
+    "ldapGroups": [
+      "LDAP_FINANCE_TEAM",
+      "LDAP_SUPPORT_TEAM",
+      "LDAP_RISK_TEAM",
+      "LDAP_TEST_MASK",
+      "LDAP_TEST_HIDE",
+      "LDAP_TEST_NESTED_DENY"
+    ]
+  },
+  "EmailOnlyUser": {
+    "description": "Can only see email address.",
+    "ldapGroups": ["LDAP_INCLUDE_EMAIL_ONLY"]
+  }
+}

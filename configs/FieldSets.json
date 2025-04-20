@@ -1,0 +1,14 @@
+{
+  "FIELD_SETS": {
+    "PII_FIELDS": [
+      "contactInformation.email",
+      "contacts.email",
+      "contactInformation.phone.mobile",
+      "identityDocuments[i].documentNumber"
+    ],
+    "AUDIT_FIELDS": [
+      "audit.createdBy",
+      "audit.lastUpdatedBy"
+    ]
+  }
+}

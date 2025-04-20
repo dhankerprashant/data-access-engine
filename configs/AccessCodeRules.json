@@ -1,0 +1,176 @@
+{
+  "ACCESS_CODE_BASIC": {
+    "priority": 50,
+    "rules": [
+      {
+        "field": "contactInformation.email",
+        "action": "mask",
+        "maskType": "EMAIL_MASK"
+      },
+      {
+        "field": "contactInformation.phone.mobile",
+        "action": "mask",
+        "maskType": "MASK_LAST4"
+      }
+    ],
+    "mergeStrategy": "most-restrictive",
+    "schemaVersion": "v1.0",
+    "lastUpdatedBy": "SecurityAdmin-001",
+    "lastUpdatedAt": "2025-04-12T09:00:00Z"
+  },
+  "ACCESS_CODE_PII": {
+    "priority": 100,
+    "rules": [
+      {
+        "field": "@PII_FIELDS",
+        "action": "redact"
+      },
+      {
+        "field": "audit.lastUpdatedBy",
+        "action": "truncate",
+        "length": 8
+      }
+    ],
+    "mergeStrategy": "most-restrictive",
+    "schemaVersion": "v1.0",
+    "lastUpdatedBy": "SecurityAdmin-002",
+    "lastUpdatedAt": "2025-04-12T09:05:00Z"
+  },
+  "ACCESS_CODE_RISK": {
+    "priority": 150,
+    "rules": [
+      {
+        "field": "riskProfile.pepStatus",
+        "action": "deny-if-condition",
+        "condition": {
+          "field": "riskProfile.pepStatus",
+          "operator": "==",
+          "value": true
+        }
+      },
+      {
+        "field": "riskProfile.kycStatus",
+        "action": "hide"
+      }
+    ],
+    "mergeStrategy": "most-restrictive",
+    "schemaVersion": "v1.0",
+    "lastUpdatedBy": "SecurityAdmin-003",
+    "lastUpdatedAt": "2025-04-12T09:10:00Z"
+  },
+  "ACCESS_CODE_CONFLICT_MASK": {
+    "priority": 80,
+    "mergeStrategy": "first-match",
+    "rules": [
+      {
+        "field": "contactInformation.email",
+        "action": "mask",
+        "maskType": "EMAIL_MASK"
+      },
+      {
+        "field": "contactInformation.phone.mobile",
+        "action": "mask",
+        "maskType": "MASK_FIRST4"
+      },
+      {
+        "field": "@PII_FIELDS",
+        "action": "redact"
+      }
+    ],
+    "schemaVersion": "v1.0"
+  },
+  "ACCESS_CODE_CONFLICT_HIDE": {
+    "priority": 50,
+    "mergeStrategy": "first-match",
+    "rules": [
+      {
+        "field": "contactInformation.email",
+        "action": "hide"
+      }
+    ],
+    "schemaVersion": "v1.0"
+  },
+  "ACCESS_CODE_DENY_CONDITION": {
+    "priority": 200,
+    "rules": [
+      {
+        "field": "contactInformation.email",
+        "action": "mask",
+        "maskType": "EMAIL_MASK"
+      },
+      {
+        "field": "riskProfile.pepStatus",
+        "action": "deny-if-condition",
+        "condition": {
+          "field": "riskProfile.pepStatus",
+          "operator": "==",
+          "value": true
+        }
+      },
+      {
+        "field": "@PII_FIELDS",
+        "action": "redact"
+      },
+      {
+        "field": "audit.lastUpdatedBy",
+        "action": "encrypt",
+        "encryptionKeyId": "key-ops-001"
+      }
+    ],
+    "mergeStrategy": "most-restrictive",
+    "schemaVersion": "v1.2",
+    "lastUpdatedBy": "SecurityAdmin-007",
+    "lastUpdatedAt": "2025-04-12T09:00:00Z"
+  },
+  "ACCESS_CODE_NESTED_DENY": {
+    "priority": 180,
+    "mergeStrategy": "most-restrictive",
+    "rules": [
+      {
+        "field": "riskProfile",
+        "action": "deny-if-condition",
+        "condition": {
+          "logic": "AND",
+          "conditions": [
+            {
+              "field": "riskProfile.pepStatus",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "logic": "OR",
+              "conditions": [
+                {
+                  "field": "riskProfile.riskCategory",
+                  "operator": "==",
+                  "value": "High"
+                },
+                {
+                  "field": "riskProfile.kycStatus",
+                  "operator": "!=",
+                  "value": "Completed"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "schemaVersion": "v1.0",
+    "lastUpdatedBy": "SecurityAdmin-008",
+    "lastUpdatedAt": "2025-04-12T15:30:00Z"
+  },
+  "ACCESS_CODE_INCLUDE_EMAIL_ONLY": {
+    "priority": 90,
+    "mergeStrategy": "first-match",
+    "rules": [
+      {
+        "field": "contactInformation.email",
+        "action": "include-only"
+      }
+    ],
+    "schemaVersion": "v1.0",
+    "lastUpdatedBy": "TestUser",
+    "lastUpdatedAt": "2025-04-12T18:00:00Z"
+  }
+}
