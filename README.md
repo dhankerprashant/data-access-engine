@@ -184,6 +184,6 @@ npx jest
 ## 👨‍💻 Maintained By
 
 **Prashant Kumar**  
-Tech Head | Platform Architect | Policy & Access Governance
+Engineer
 
 ---
