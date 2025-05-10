@@ -3,17 +3,26 @@ import groupAccessMapRaw from '../../configs/GroupAccessMap.json';
 import fieldSetsRaw from '../../configs/FieldSets.json';
 import { Rule } from '../types';
 
+/**
+ * Loaded static configuration files.
+ */
 const accessCodeRules: Record<string, any> = accessCodeRulesRaw;
 const groupAccessMap: Record<string, string[]> = groupAccessMapRaw;
 
-// Flatten FIELD_SETS into @PII_FIELDS, @AUDIT_FIELDS format
+/**
+ * FIELD_SETS are flattened into special meta-keys like @PII_FIELDS.
+ * These are expanded later during rule resolution.
+ */
 const fieldSets: Record<string, string[]> = {};
 const rawSets = fieldSetsRaw?.FIELD_SETS || {};
-
 Object.entries(rawSets).forEach(([key, fields]) => {
   fieldSets[`@${key}`] = fields;
 });
 
+/**
+ * Resolves access codes from one or more LDAP group names.
+ * Each group can be mapped to multiple access control codes.
+ */
 export function resolveAccessCodes(ldapGroups: string[]): string[] {
   const codes = new Set<string>();
   ldapGroups.forEach(group => {
@@ -22,6 +31,10 @@ export function resolveAccessCodes(ldapGroups: string[]): string[] {
   return Array.from(codes);
 }
 
+/**
+ * Restrictiveness level mapping for each rule action.
+ * Higher numbers are considered more restrictive when resolving conflicts.
+ */
 function getRestrictivenessLevel(action: string): number {
   const levels: Record<string, number> = {
     'deny-if-condition': 999,
@@ -35,6 +48,9 @@ function getRestrictivenessLevel(action: string): number {
   return levels[action] ?? 0;
 }
 
+/**
+ * Captures detailed trace of how rule conflicts are resolved between access codes.
+ */
 interface ConflictTrace {
   field: string;
   ruleA: Rule & { strategy: string; source: string; priority: number };
@@ -43,7 +59,9 @@ interface ConflictTrace {
   reason: string;
 }
 
-// Expand @FIELD_SETS (e.g. @PII_FIELDS) into concrete field rules
+/**
+ * Expands special meta-fields like @PII_FIELDS into concrete rules for each field path.
+ */
 function expandFieldSets(rules: Rule[]): Rule[] {
   const expanded: Rule[] = [];
 
@@ -64,6 +82,13 @@ function expandFieldSets(rules: Rule[]): Rule[] {
   return expanded;
 }
 
+/**
+ * Main function that merges all rules associated with the user's access codes,
+ * resolves conflicts according to configured merge strategies, and traces decisions.
+ *
+ * @param accessCodes Access control codes assigned to the user (e.g., ["ACCESS_CODE_PII", "ACCESS_CODE_BASIC"])
+ * @param schemaVersion Optional schema version filter to restrict rules (default: "v1.0")
+ */
 export function mergeRulesWithTrace(
   accessCodes: string[],
   schemaVersion = 'v1.0'
@@ -87,7 +112,6 @@ export function mergeRulesWithTrace(
     console.log(`\n Evaluating access code: ${code}`);
     console.log(` Strategy: ${strategy}, priority: ${priority}`);
 
-    // ✅ EXPAND FIELD SETS EARLY
     const expandedRules = expandFieldSets(config.rules);
 
     expandedRules.forEach((rule: Rule) => {
@@ -98,16 +122,14 @@ export function mergeRulesWithTrace(
 
       console.log(` Rule: ${JSON.stringify(rule)}`);
 
+      // First rule wins if no conflict
       if (!existing) {
         fieldRulesMap[field] = incoming;
         console.log(` No previous rule found for ${field}. Taking new rule.`);
         return;
       }
 
-      const taggedExisting = {
-        ...existing
-      };
-
+      const taggedExisting = { ...existing };
       let shouldReplace = false;
       let reason = '';
 
@@ -118,32 +140,28 @@ export function mergeRulesWithTrace(
       console.log(` Existing: action=${existing.action}, strategy=${existing.strategy}, priority=${existing.priority}, source=${existing.source}`);
       console.log(` Incoming: action=${rule.action}, strategy=${strategy}, priority=${priority}, source=${code}`);
 
+      // Conflict resolution strategy
       if (strategy === 'most-restrictive') {
-        if (
-          levelNew > levelOld ||
-          (levelNew === levelOld && priority > existing.priority)
-        ) {
+        if (levelNew > levelOld || (levelNew === levelOld && priority > existing.priority)) {
           shouldReplace = true;
           reason = 'more restrictive or higher priority (most-restrictive)';
         }
       }
 
       if (strategy === 'least-restrictive') {
-        if (
-          levelNew < levelOld ||
-          (levelNew === levelOld && priority > existing.priority)
-        ) {
+        if (levelNew < levelOld || (levelNew === levelOld && priority > existing.priority)) {
           shouldReplace = true;
           reason = 'less restrictive or higher priority (least-restrictive)';
         }
       }
 
       if (strategy === 'first-match') {
-        // First encountered rule wins, do not replace
+        // First match always wins
         shouldReplace = false;
         reason = 'existing rule retained (first-match)';
       }
 
+      // Update rule map and trace
       if (shouldReplace) {
         console.log(`Replacing existing rule with incoming. Reason: ${reason}`);
         conflictTraces.push({
@@ -174,7 +192,7 @@ export function mergeRulesWithTrace(
   console.log(JSON.stringify(conflictTraces, null, 2));
 
   return {
-    rules: Object.values(fieldRulesMap), // already expanded above
+    rules: Object.values(fieldRulesMap),
     conflicts: conflictTraces
   };
 }

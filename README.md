@@ -1,18 +1,20 @@
 # 🧠 Data Access Engine – Node.js + TypeScript
 
-This project is a deeply engineered data access policy platform inspired by **Google Zanzibar**, **Oso**, and **Amazon Cedar** — built to enforce **schema-governed, field-level access control** using a role- and group-based identity model. It supports conflict resolution, access traceability, and is being evolved toward a **graph-based rule evaluation engine** with full **auditing and explainability**.
+This project is a deeply engineered data access policy platform inspired by **Google Zanzibar**, **Oso**, and **Amazon Cedar** — built to enforce **schema-governed, field-level policy-governed access controls** using a role and group-based identity model. It supports conflict resolution, meta field expansion, access traceability, and is being evolved toward a **graph-based rule evaluation engine** with full **auditing and explainability**.
 
 ---
 
-## 🎯 Purpose
+## 🎯 Project Purpose
 
-To build a robust, scalable, and policy-governed backend service that:
-- Retrieves sensitive customer data
-- Enforces **field-level access control rules**
-- Resolves **conflicts** between rules from multiple roles
-- Provides **traceable decisions** for every access
-- Supports **schema versioning** and **safe evolution**
-- Is designed for **graph-oriented access policy evaluation** in the future
+To build a composable and policy-aware engine that:
+
+- Retrieves and secures structured customer data (e.g., financial, KYC, PII)
+- Applies **field-level actions** (hide, mask, redact, deny, include-only)
+- Supports **RBAC**, **ABAC**, and **ReBAC** through JSON policies
+- Merges rules from multiple roles using configurable strategies
+- Provides **traceable decisions** including **conflicts** between rules
+- Enables *simulation* and override testing via headers
+- Is designed for **graph-based policy evaluation and auditable security**
 
 ---
 
@@ -22,7 +24,7 @@ To build a robust, scalable, and policy-governed backend service that:
 |---------------------|------------------|
 | **Google Zanzibar** | Group-object-relationship abstraction, delegation graph |
 | **Amazon Cedar**    | Schema-based access policy versioning and evaluation |
-| **Oso**             | Role mapping to policies, policy engine extensibility |
+| **OSO**             | Role mapping to policies, policy engine extensibility |
 | **DAGs**            | Directed Acyclic Graphs for rule propagation & dependency resolution |
 
 ---
@@ -37,55 +39,97 @@ To build a robust, scalable, and policy-governed backend service that:
 
 ---
 
-## 📋 Supported Rule Actions
+## 📚 Design Inspiration
 
-| Action             | Description                                      |
-|--------------------|--------------------------------------------------|
-| `hide`             | Completely removes the field from the response   |
-| `mask`             | Obfuscates sensitive fields (e.g. `****1234`)    |
-| `redact`           | Replaces value with `[REDACTED]`                 |
-| `truncate`         | Cuts the field to a defined length               |
-| `nullify`          | Replaces value with `null`                       |
-| `include-only`     | Includes only specified fields in a subtree      |
-| `deny-if-condition`| Removes entire subtree if condition is satisfied |
+| Source               | Feature Adapted |
+|----------------------|------------------|
+| **Google Zanzibar**  | Schema-governed access model |
+| **OSO**              | Role mapping to policies, policy engine extensibility |
+| **OPI**              | Open Policy Interop for policy execution trace |
+| **DAGs**             | Directed Acyclic Graphs for rule propagation & dependency resolution |
+| **Zanzibar Graphs**  | Future plan for ReBAC & hierarchy graphs |
 
 ---
 
-## ⚖️ Merge Strategies (for conflict resolution)
+## 🧩 Architecture Components
 
-| Strategy          | Description                                         |
-|-------------------|-----------------------------------------------------|
-| `most-restrictive`| Keeps the rule that reveals the least amount of data |
-| `least-restrictive`| Prefers more visible data                          |
-| `first-match`     | Rule from highest-priority access code is applied   |
-
----
-
-## 🧠 Schema Versioning
-
-Each customer has:
-```json
-"policySchemaVersion": "v1.0"
+```
+Client Request
+   ↓
+Express Middleware (JWT or Simulation Header)
+   ↓
+LDAP Group Resolver → Access Codes → Rules
+   ↓
+Rule Resolver (Merge Strategy: first-match, most-restrictive)
+   ↓
+Response Transformer (redact, hide, mask, deny-if, include-only)
+   ↓
+Transformed Response + Trace Log
 ```
 
-Only access codes matching that version are evaluated, enabling:
-- 🚫 No regression from rule upgrades
-- ✅ Safe migration to future rule schema versions
+---
+
+## 🛡️ Access Strategies
+
+Each rule can perform:
+
+- `hide`: Remove field
+- `nullify`: Set to null
+- `redact`: Replace with `***REDACTED***`
+- `mask`: Mask string based on mask type
+- `truncate`: Limit field length
+- `deny-if-condition`: Block entire response
+- `include-only`: Return only explicitly included fields
 
 ---
 
-## 🕸️ [Next Gen] Graph-Based Rule Engine (Planned)
+## 🔁 Conflict Resolution
 
-The system is being architected to support:
-- Access rules as **nodes in a graph**
-- Relationships between rules (inheritance, delegation)
-- Schema evolution as **versioned DAGs**
-- Policy resolution using **graph traversal** (like Zanzibar)
+Access codes are assigned to users via LDAP groups. Rules are merged across multiple codes using strategies:
 
-Benefits:
-- Better performance for complex policy combinations
-- Allows modeling real-world delegation chains (e.g., managers, nested roles)
-- Enables access justification by path (like Zanzibar's explain graph)
+- `first-match`: Only the highest-priority rule is used
+- `most-restrictive`: More secure transformation wins
+- `least-restrictive`: More permissive action wins
+
+All conflicts and resolutions are returned in `_conflictTrace`.
+
+---
+
+## 🧪 Testing & Coverage
+
+- ✅ 90%+ line coverage with Jest
+- Tests cover:
+  - Rule resolution logic
+  - Conflict merging
+  - Path resolution with wildcards
+  - Masking edge cases
+- Run using: `npm test` or `npx jest --coverage`
+
+---
+
+## ⚙️ API Simulation & Headers
+
+Use custom header to simulate any role in tests:
+
+```
+x-simulate-user: RiskAnalyst
+```
+
+Fallback to JWT (`Authorization: Bearer`) if simulation is not passed.
+
+---
+
+## 🧠 Meta Fields & Sets
+
+Rules can use meta sets like `@PII_FIELDS`, expanded via `FieldSets.json`. These are translated during merging into concrete fields like:
+
+```json
+"@PII_FIELDS": [
+  "contactInformation.email",
+  "contactInformation.phone.mobile",
+  "identityDocuments[i].documentNumber"
+]
+```
 
 ---
 
@@ -101,11 +145,23 @@ Benefits:
 - Admin dashboard to search historical rule evaluations
 
 ---
+## 🧰 Dev Setup
+
+```bash
+npm install
+npm run build
+npm run start
+npx jest --detectOpenHandles --coverage
+```
+
+Use `npm run dev` with `ts-node-dev` or `nodemon` for hot-reload dev loop.
+
+---
 
 ## 📂 Project Structure
 
 ```
-data-access-engine-ts/
+data-access-engine/
 ├── src/
 │   ├── app.ts
 │   ├── middleware/
@@ -118,16 +174,6 @@ data-access-engine-ts/
 ├── tsconfig.json
 ├── jest.config.js
 └── README.md
-```
-
----
-
-## 🚀 Running It
-
-```bash
-npm install
-npx tsc
-node dist/app.js
 ```
 
 ---
@@ -147,15 +193,6 @@ node dist/app.js
     }
   ]
 }
-```
-
----
-
-## 🧪 Test with Jest
-
-```bash
-npm install --save-dev jest ts-jest @types/jest
-npx jest
 ```
 
 ---
@@ -181,9 +218,6 @@ npx jest
 
 ---
 
-## 👨‍💻 Maintained By
-
-**Prashant Kumar**  
-Engineer
+## 👨‍💻 **Prashant Kumar** 
 
 ---
