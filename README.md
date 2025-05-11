@@ -209,9 +209,8 @@ data-access-engine/
 
 | Feature               | Status      |
 |------------------------|-------------|
-| Graph-based rule engine| 🔜 Designing |
 | MongoDB config loader  | ✅ Stubbed   |
-| Rule auditing & export | 🔜 Planned  |
+| Rule export            | 🔜 Planned  |
 | Schema evolution DSL   | 🔜 Future   |
 | Role inheritance logic | 🔜 Possible |
 | Real-time admin UI     | 🔜 Optional |
